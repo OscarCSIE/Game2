@@ -4,8 +4,17 @@
 
 using namespace sf;
 
+/*
+text here:
+try to reboot the live?
+i triedd last night, i think it is busted
+
+https://www.sfml-dev.org/documentation/2.6.0/modules.php
+SFML website for us to check
+可能要研究一下GIT 修改之後長怎樣這樣
+*/
 int main(){
-    RenderWindow window(VideoMode(1024, 768), "SFML works!");
+    RenderWindow window(VideoMode(1024, 768), "SFML Window");
     window.setFramerateLimit(60);
 
     CircleShape circle(100.f);
@@ -29,6 +38,5 @@ int main(){
         window.draw(rectangle);
         window.display();
     }
-
     return 0;
 }
