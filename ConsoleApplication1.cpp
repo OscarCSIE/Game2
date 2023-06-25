@@ -6,8 +6,6 @@ using namespace sf;
 
 /*
 text here:
-try to reboot the live?
-i triedd last night, i think it is busted
 
 https://www.sfml-dev.org/documentation/2.6.0/modules.php
 SFML website for us to check
