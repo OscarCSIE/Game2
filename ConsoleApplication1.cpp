@@ -1,53 +1,74 @@
 // ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 
-using namespace sf;
+float WINDOW_HEIGHT = 512;
+float WINDOW_WIDTH = 512;
 
-/*
-text here:
-
-https://www.sfml-dev.org/documentation/2.6.0/modules.php
-SFML website for us to check
-
-https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
-
-*/
 int main(){
-    RenderWindow window(VideoMode(1024, 768), "SFML Window");
+    sf::RenderWindow window(sf::VideoMode((unsigned int)WINDOW_WIDTH, (unsigned int)WINDOW_HEIGHT), "SFML Window");
     window.setFramerateLimit(60);
+    sf::Clock clock;
+    float movementSpeed = 10;
 
-    CircleShape circle(100.f);
-    RectangleShape rectangle;
-    circle.setFillColor(Color::Green);
-    rectangle.setFillColor(Color::Magenta);
+    sf::RectangleShape PlayerA(sf::Vector2f(100, 200));
 
-    Vector2f rectanglePosition(512, 384);
-    rectangle.setPosition(rectanglePosition);
-    rectangle.setSize(Vector2f(100,200) );
+    PlayerA.setFillColor(sf::Color::Red);
+    PlayerA.setPosition(sf::Vector2f(0, 0));
 
 
-    Font open_sans;
+    sf::Font open_sans;
     open_sans.loadFromFile("C:\\Users\\Administrator\\Desktop\\Visual Studio\\Fonts\\open-sans\\OpenSans-Light.ttf");
-    Text message;
+    sf::Text message;
     message.setFont(open_sans);
+    message.setFillColor(sf::Color::Green);
+    message.setCharacterSize(48);
     message.setString("Hello World");
-    message.setPosition(300, 400);
+    sf::FloatRect messageBounds = message.getLocalBounds();
+    message.setOrigin(messageBounds.left + messageBounds.width / 2.0f, 0);
+    message.setPosition(window.getSize().x / 2.0f, 0);
 
     while (window.isOpen()){
-        Event event;
-
+        sf::Event event;
+        
         while ( window.pollEvent(event) ){
-            if (event.type == Event::Closed)window.close();
-            if (Keyboard::isKeyPressed(Keyboard::Escape))window.close();
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+                window.close();
+            }
         }
+
+        float movementX = 0.0f;
+        float movementY = 0.0f;
+
+        // Check for keyboard input
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+            movementY -= movementSpeed;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            movementY += movementSpeed;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            movementX -= movementSpeed;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            movementX += movementSpeed;
+
+        // Normalize the movement vector if diagonal movement is detected
+        if (movementX * movementY != 0.0f){
+            float length = std::sqrt(movementX * movementX + movementY * movementY);
+            movementX = (movementX / length) * movementSpeed;
+            movementY = (movementY / length) * movementSpeed;
+        }
+
+        PlayerA.move(movementX, movementY); // Move the object
+
         window.clear();
-        window.draw(circle);
-        window.draw(rectangle);
+        window.draw(PlayerA);
         window.draw(message);
         window.display();
     }
