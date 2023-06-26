@@ -18,8 +18,7 @@ private:
     sf::RenderWindow* window;
 
     float movementSpeed = 500.f;
-    float jumpSpeed = -500.f;
-    float gravity = 98.f;
+    const float gravity = 9800.f;
 
 public:
     Player(sf::Vector2f size, sf::Vector2f position, sf::Color color, sf::RenderWindow* window)
@@ -32,39 +31,43 @@ public:
     void update(float deltaTime) {
         sf::Vector2f velocity = { 0.f, 0.f };
 
-        // Check for keyboard input
-        if (!isJumping) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-                velocity.x -= movementSpeed;
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-                velocity.x += movementSpeed;
-            }
+        // Check for keyboard input 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            velocity.x -= movementSpeed;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            velocity.x += movementSpeed;
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && !isJumping) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
             isJumping = true;
-            velocity.y = jumpSpeed;
+            velocity.y -= 3 * movementSpeed;  // Start moving upwards
         }
 
         if (isJumping) {
-            velocity.y += gravity * deltaTime;
-
-            if (pos.y>=this->window->getSize().y - rectangle.getSize().y) {
-                velocity.y = 0.0f;
+            velocity.y += 4.5 * gravity * deltaTime;
+            pos.y += 4.5 * velocity.y * deltaTime;
+            if (pos.y == this->window->getSize().y - rectangle.getSize().y) {
                 isJumping = false;
             }
         }
 
         // Update player position
-        pos = rectangle.getPosition() + sf::Vector2f(velocity.x * deltaTime, velocity.y);
+        pos = rectangle.getPosition() + sf::Vector2f(velocity.x * deltaTime, velocity.y * deltaTime);
 
         // Check collision with window borders
-        if (pos.x < 0) {
+        if (pos.x <= 0) {
             pos.x = 0;
         }
-        else if (pos.x + rectangle.getSize().x > window->getSize().x) {
+        if (pos.x> this->window->getSize().x - rectangle.getSize().x) {
             pos.x = window->getSize().x - rectangle.getSize().x;
+        }
+        if (pos.y <= 0) {
+            pos.y = 0;
+        }
+        if (pos.y >= this->window->getSize().y - rectangle.getSize().y) {
+            pos.y = this->window->getSize().y - rectangle.getSize().y;
+            velocity.y = 0;
         }
 
         rectangle.setPosition(pos);
@@ -78,7 +81,7 @@ public:
 
 int main() {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktopMode, "SFML Game");
+    sf::RenderWindow window(sf::VideoMode(512, 512), "SFML Game");
     window.setPosition(sf::Vector2i(0, 0));
     window.setFramerateLimit(60);
     sf::View view(sf::FloatRect(0.f, 0.f, static_cast<float>(desktopMode.width), static_cast<float>(desktopMode.height)));
@@ -86,14 +89,14 @@ int main() {
 
     sf::Clock clock;
 
-    Player PlayerA(sf::Vector2f(100, 100), sf::Vector2f(0, (float)window.getSize().y), sf::Color::Red, &window);
+    Player PlayerA(sf::Vector2f(100, 100), sf::Vector2f(0, (float)window.getSize().y - 100), sf::Color::Red, &window);
 
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
                 window.close();
         }
 
