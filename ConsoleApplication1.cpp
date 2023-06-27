@@ -41,7 +41,7 @@ public:
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
             isJumping = true;
-            velocity.y -= 3 * movementSpeed;  // Start moving upwards
+            velocity.y -= 4.5 * movementSpeed;  // Start moving upwards
         }
 
         if (isJumping) {
